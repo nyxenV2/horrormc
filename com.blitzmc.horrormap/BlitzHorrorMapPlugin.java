@@ -22,7 +22,7 @@ public class BlitzHorrorMapPlugin extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Initialize managers
+        
         this.lobbyManager = new LobbyManager(this);
         this.mapManager = new MapManager(this);
         this.partyManager = new PartyManager(this);
@@ -36,7 +36,7 @@ public class BlitzHorrorMapPlugin extends JavaPlugin {
         this.economyManager = new EconomyManager(this);
         this.achievementManager = new AchievementManager(this);
 
-        // Register commands and events
+        
         getCommand("blitzhorror").setExecutor(new BlitzHorrorCommand(this));
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 
@@ -45,7 +45,6 @@ public class BlitzHorrorMapPlugin extends JavaPlugin {
             new BlitzHorrorPlaceholderExpansion(this).register();
         }
 
-        // Console message for author and plugin info
         getLogger().info("=======================================");
         getLogger().info("Advanced Horror Plugin by BlitzMC Team");
         getLogger().info("Author: Moses Alfred");
@@ -53,17 +52,14 @@ public class BlitzHorrorMapPlugin extends JavaPlugin {
         getLogger().info("Thank you for using the Advanced Horror Plugin!");
         getLogger().info("=======================================");
 
-        // Load configurations
         saveDefaultConfig();
     }
 
     @Override
     public void onDisable() {
-        // Cleanup sessions and instances
         sessionManager.cleanupAllSessions();
     }
 
-    // Getters for managers
     public LobbyManager getLobbyManager() { return lobbyManager; }
     public MapManager getMapManager() { return mapManager; }
     public PartyManager getPartyManager() { return partyManager; }
