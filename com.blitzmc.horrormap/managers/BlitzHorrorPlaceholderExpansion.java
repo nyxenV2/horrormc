@@ -46,12 +46,10 @@ public class BlitzHorrorPlaceholderExpansion extends PlaceholderExpansion {
 
     @Override
     public String onPlaceholderRequest(Player player, String identifier) {
-        // Return player's session status
         if (identifier.equals("session_status")) {
             return getSessionStatus(player);
         }
 
-        // Return player's leaderboard position for a specific map
         if (identifier.startsWith("leaderboard_position_")) {
             String mapName = identifier.split("leaderboard_position_")[1];
             return getLeaderboardPosition(player, mapName);
@@ -60,12 +58,10 @@ public class BlitzHorrorPlaceholderExpansion extends PlaceholderExpansion {
         return null;
     }
 
-    // Retrieve session status
     private String getSessionStatus(Player player) {
         return plugin.getSessionManager().getSessionByPlayer(player) != null ? "In Session" : "Not in Session";
     }
 
-    // Retrieve leaderboard position for a specific map
     private String getLeaderboardPosition(Player player, String mapName) {
         Connection databaseConnection = plugin.getLeaderboardManager().getDatabaseConnection();
         if (databaseConnection == null) {

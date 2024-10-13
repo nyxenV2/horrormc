@@ -14,7 +14,7 @@ public class SessionManager {
 
     private BlitzHorrorMapPlugin plugin;
     private Map<UUID, Session> activeSessions;
-    private Map<String, Integer> worldLoadMap; // Keeps track of load per world instance
+    private Map<String, Integer> worldLoadMap;
 
     public SessionManager(BlitzHorrorMapPlugin plugin) {
         this.plugin = plugin;
@@ -22,9 +22,8 @@ public class SessionManager {
         this.worldLoadMap = new HashMap<>();
     }
 
-    // Start a session with load balancing logic
     public void startSession(Party party, String mapName) {
-        String instanceName = getLeastLoadedWorld(mapName); // Load-balancing logic
+        String instanceName = getLeastLoadedWorld(mapName);
         Session session = new Session(party, mapName, instanceName);
         activeSessions.put(party.getLeader().getUniqueId(), session);
 
@@ -35,7 +34,6 @@ public class SessionManager {
                 for (Player player : party.getMembers()) {
                     player.teleport(world.getSpawnLocation());
                     String resourcePackURL = party.getSettings().getResourcePackURL();
-
                     if (resourcePackURL != null) {
                         player.setResourcePack(resourcePackURL);
                     } else {
@@ -50,16 +48,14 @@ public class SessionManager {
                 plugin.getLogger().info("§a[BlitzMC] Session started for party led by " + party.getLeader().getName() + " on map " + mapName);
             });
 
-            incrementWorldLoad(instanceName); 
+            incrementWorldLoad(instanceName);
         });
     }
 
-    
     private String getLeastLoadedWorld(String mapName) {
         String leastLoadedWorld = null;
         int minLoad = Integer.MAX_VALUE;
 
-        
         for (Map.Entry<String, Integer> entry : worldLoadMap.entrySet()) {
             String worldName = entry.getKey();
             int load = entry.getValue();
@@ -69,29 +65,25 @@ public class SessionManager {
             }
         }
 
-        
         if (leastLoadedWorld == null) {
             leastLoadedWorld = "blitz_map_" + UUID.randomUUID();
-            worldLoadMap.put(leastLoadedWorld, 0); // Initialize load count for the new world
+            worldLoadMap.put(leastLoadedWorld, 0);
         }
 
         return leastLoadedWorld;
     }
 
-   
     private void incrementWorldLoad(String worldName) {
         worldLoadMap.put(worldName, worldLoadMap.getOrDefault(worldName, 0) + 1);
     }
 
-    
     public void decrementWorldLoad(String worldName) {
         worldLoadMap.put(worldName, worldLoadMap.getOrDefault(worldName, 0) - 1);
         if (worldLoadMap.get(worldName) <= 0) {
-            worldLoadMap.remove(worldName); 
+            worldLoadMap.remove(worldName);
         }
     }
 
-   
     public void cleanupSession(Session session, boolean recycle) {
         plugin.getVoiceChatManager().disableVoiceChat(session);
         Bukkit.getScheduler().runTask(plugin, () -> {
@@ -99,27 +91,10 @@ public class SessionManager {
                 plugin.getLobbyManager().teleportToLobby(player);
             }
             plugin.getInstanceManager().deleteInstance(session.getInstanceName(), recycle);
-
-           
             decrementWorldLoad(session.getInstanceName());
         });
         activeSessions.remove(session.getParty().getLeader().getUniqueId());
         plugin.getLogger().info("§a[BlitzMC] Session " + session.getInstanceName() + " has been cleaned up.");
-    }
-
-    
-    public int getActiveSessionCount(String worldName) {
-        return worldLoadMap.getOrDefault(worldName, 0);
-    }
-
-    // Get the session associated with a player
-    public Session getSessionByPlayer(Player player) {
-        for (Session session : activeSessions.values()) {
-            if (session.getParty().hasMember(player)) {
-                return session;
-            }
-        }
-        return null;
     }
 
     public void cleanupAllSessions() {

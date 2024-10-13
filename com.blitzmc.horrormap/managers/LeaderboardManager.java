@@ -17,7 +17,7 @@ import java.util.UUID;
 public class LeaderboardManager {
 
     private BlitzHorrorMapPlugin plugin;
-    private Connection databaseConnection; // Database connection (MySQL or SQLite)
+    private Connection databaseConnection;
 
     public LeaderboardManager(BlitzHorrorMapPlugin plugin) {
         this.plugin = plugin;
@@ -25,9 +25,7 @@ public class LeaderboardManager {
         createTablesIfNotExists();
     }
 
-    // Setup database connection
     private Connection setupDatabase() {
-        // Setup MySQL or SQLite based on the server configuration
         try {
             return Bukkit.getPluginManager().getPlugin("SomeDatabasePlugin").getDatabase().getConnection();
         } catch (SQLException e) {
@@ -36,7 +34,6 @@ public class LeaderboardManager {
         return null;
     }
 
-    // Create tables if they don't exist
     private void createTablesIfNotExists() {
         try (PreparedStatement statement = databaseConnection.prepareStatement(
                 "CREATE TABLE IF NOT EXISTS leaderboards (" +
@@ -53,7 +50,6 @@ public class LeaderboardManager {
         }
     }
 
-    // Record stats in the leaderboard
     public void recordSession(UUID playerId, String mapName, boolean won, int completionTime) {
         try (PreparedStatement statement = databaseConnection.prepareStatement(
                 "INSERT INTO leaderboards (player_uuid, map_name, wins, losses, completion_time) " +
@@ -74,7 +70,6 @@ public class LeaderboardManager {
         }
     }
 
-    // Display leaderboard for a specific map
     public void showLeaderboard(Player player, String mapName) {
         Inventory leaderboardGui = Bukkit.createInventory(null, 27, "Leaderboard for " + mapName);
 
@@ -105,7 +100,6 @@ public class LeaderboardManager {
         player.openInventory(leaderboardGui);
     }
 
-    // Fetch player statistics
     public void showPlayerStats(Player player) {
         try (PreparedStatement statement = databaseConnection.prepareStatement(
                 "SELECT map_name, wins, losses, completion_time FROM leaderboards WHERE player_uuid = ?"

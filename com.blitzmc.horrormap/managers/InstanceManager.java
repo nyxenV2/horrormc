@@ -2,6 +2,8 @@ package com.blitzmc.horrormap.managers;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
@@ -12,9 +14,11 @@ import com.blitzmc.horrormap.BlitzHorrorMapPlugin;
 public class InstanceManager {
 
     private BlitzHorrorMapPlugin plugin;
+    private Map<String, World> activeWorlds;
 
     public InstanceManager(BlitzHorrorMapPlugin plugin) {
         this.plugin = plugin;
+        this.activeWorlds = new HashMap<>();
     }
 
     public void createInstance(String mapName, String instanceName, Runnable onComplete) {
@@ -26,12 +30,18 @@ public class InstanceManager {
         }
 
         File target = new File(Bukkit.getWorldContainer(), instanceName);
+        if (activeWorlds.containsKey(instanceName)) {
+            plugin.getLogger().log(Level.INFO, "World instance already exists: " + instanceName);
+            onComplete.run();
+            return;
+        }
+
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
                 FileUtils.copyDirectory(source, target);
                 Bukkit.getScheduler().runTask(plugin, () -> {
                     World world = new WorldCreator(instanceName).createWorld();
-                    plugin.getInstanceManager().addActiveWorld(instanceName, world);
+                    activeWorlds.put(instanceName, world);
                     onComplete.run();
                 });
             } catch (IOException e) {
@@ -42,7 +52,7 @@ public class InstanceManager {
     }
 
     public void deleteInstance(String instanceName, boolean recycle) {
-        World world = plugin.getInstanceManager().getActiveWorld(instanceName);
+        World world = activeWorlds.remove(instanceName);
         if (world != null) {
             Bukkit.unloadWorld(world, false);
         }
@@ -57,13 +67,6 @@ public class InstanceManager {
                 }
             });
         }
-    }
-
-    // Manage active worlds
-    private Map<String, World> activeWorlds = new HashMap<>();
-
-    public void addActiveWorld(String instanceName, World world) {
-        activeWorlds.put(instanceName, world);
     }
 
     public World getActiveWorld(String instanceName) {

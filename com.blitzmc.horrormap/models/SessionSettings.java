@@ -13,7 +13,6 @@ public class SessionSettings {
     private int maxPartySize;
 
     public SessionSettings() {
-        // Set default settings
         this.playerCount = 4;
         this.voiceChatEnabled = false;
         this.proximityVoiceChat = true;
@@ -22,10 +21,8 @@ public class SessionSettings {
         this.timeOfDay = "night";
         this.difficulty = "normal";
         this.resourcePackURL = null;
-        this.maxPartySize = 4; // Default maximum party size
+        this.maxPartySize = 4;
     }
-
-    // Getters and setters for each setting
 
     public int getPlayerCount() {
         return playerCount;

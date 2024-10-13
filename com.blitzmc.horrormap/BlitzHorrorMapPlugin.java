@@ -40,11 +40,12 @@ public class BlitzHorrorMapPlugin extends JavaPlugin {
         getCommand("blitzhorror").setExecutor(new BlitzHorrorCommand(this));
         getServer().getPluginManager().registerEvents(new PlayerListener(this), this);
 
-        // PlaceholderAPI integration
+        
         if (getServer().getPluginManager().getPlugin("PlaceholderAPI") != null) {
             new BlitzHorrorPlaceholderExpansion(this).register();
         }
 
+        
         getLogger().info("=======================================");
         getLogger().info("Advanced Horror Plugin by BlitzMC Team");
         getLogger().info("Author: Moses Alfred");
@@ -52,14 +53,17 @@ public class BlitzHorrorMapPlugin extends JavaPlugin {
         getLogger().info("Thank you for using the Advanced Horror Plugin!");
         getLogger().info("=======================================");
 
+        
         saveDefaultConfig();
     }
 
     @Override
     public void onDisable() {
+        
         sessionManager.cleanupAllSessions();
     }
 
+    
     public LobbyManager getLobbyManager() { return lobbyManager; }
     public MapManager getMapManager() { return mapManager; }
     public PartyManager getPartyManager() { return partyManager; }
